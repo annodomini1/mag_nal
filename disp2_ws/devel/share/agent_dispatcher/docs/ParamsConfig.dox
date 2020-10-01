@@ -1,0 +1,7 @@
+\subsubsection parameters ROS parameters
+
+Reads and maintains the following parameters on the ROS server
+
+- \b "~distance_factor" : \b [double] Distance reward factor. min: 0.01, default: 1.0, max: 2.0
+- \b "~occupancy_factor" : \b [double] Occupancy reward factor. min: 0.01, default: 1.0, max: 2.0
+

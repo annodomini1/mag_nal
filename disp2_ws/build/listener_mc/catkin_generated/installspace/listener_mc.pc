@@ -1,0 +1,8 @@
+prefix=/home/martin/disp2_ws/install
+
+Name: listener_mc
+Description: Description of listener_mc
+Version: 0.0.0
+Cflags: 
+Libs: -L${prefix}/lib 
+Requires: 

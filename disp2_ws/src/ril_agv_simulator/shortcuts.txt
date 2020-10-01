@@ -1,0 +1,4 @@
+# To build the map:
+roslaunch ril_agv_simulator mapping.launch
+rosrun topic_tools relay /robot_0/map map
+rosrun map_server map_saver

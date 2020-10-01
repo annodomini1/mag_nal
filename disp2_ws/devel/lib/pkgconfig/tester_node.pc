@@ -1,0 +1,8 @@
+prefix=/home/martin/disp2_ws/devel
+
+Name: tester_node
+Description: Description of tester_node
+Version: 0.0.0
+Cflags: 
+Libs: -L${prefix}/lib 
+Requires: 

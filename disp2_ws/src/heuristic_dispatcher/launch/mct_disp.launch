@@ -1,0 +1,3 @@
+<launch>
+    <node pkg="heuristic_dispatcher" type="mctdisp.py" name="heur_disp_node" output="screen" />
+</launch>

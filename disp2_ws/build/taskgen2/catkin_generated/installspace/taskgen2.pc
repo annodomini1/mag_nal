@@ -1,0 +1,8 @@
+prefix=/home/martin/disp2_ws/install
+
+Name: taskgen2
+Description: Description of taskgen2
+Version: 0.0.0
+Cflags: -I/home/martin/disp2_ws/install/include
+Libs: -L/home/martin/disp2_ws/install/lib 
+Requires: message_runtime

@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<launch>
+    <param name ="/use_sim_time" value="true"/>
+    <arg name="model" default="robot"/>
+    <arg name="number" default="0"/>
+    <arg name="x" default="0.0"/>
+    <arg name="y" default="0.0"/>
+    <arg name="z" default="0.01"/>
+    <arg name="roll" default="0"/>
+    <arg name="pitch" default="0"/>
+    <arg name="yaw" default="0"/>
+    <!-- SPAWN ROBOT -->
+    <param name="robot_description" command="$(find xacro)/xacro '$(find ril_agv_simulator)/urdf/$(arg model).xacro' number:=$(arg number)"/>
+    <node name="robot_spawn" pkg="gazebo_ros" type="spawn_model" output="screen" args="-urdf -param robot_description -model $(arg number) -x $(arg x) -y $(arg y) -z $(arg z) -R $(arg roll) -P $(arg pitch) -Y $(arg yaw)"/>
+    <!-- Robot state publisher--> -->
+    <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher">
+        <param name="use_tf_static" value="false"/>
+        <param name="tf_prefix" value="robot_$(arg number)"/>
+    </node>
+    <!-- Map relay -->
+    <node name="map_relay" pkg="topic_tools" type="relay" args="/map /robot_$(arg number)/map"/>
+    <!--- Run AMCL -->
+    <!-- <include file="$(find amcl)/examples/amcl_diff.launch"/> -->
+    <node pkg="amcl" type="amcl" name="amcl">
+        <param name="use_map_topic" value="true"/>
+        <!-- Publish scans from best pose at a max of 10 Hz -->
+        <param name="odom_model_type" value="diff"/>
+        <param name="odom_alpha5" value="0.1"/>
+        <param name="gui_publish_rate" value="10.0"/>
+        <param name="laser_max_beams" value="60"/>
+        <param name="laser_max_range" value="12.0"/>
+        <param name="min_particles" value="500"/>
+        <param name="max_particles" value="2000"/>
+        <param name="kld_err" value="0.05"/>
+        <param name="kld_z" value="0.99"/>
+        <param name="odom_alpha1" value="0.2"/>
+        <param name="odom_alpha2" value="0.2"/>
+        <!-- translation std dev, m -->
+        <param name="odom_alpha3" value="0.2"/>
+        <param name="odom_alpha4" value="0.2"/>
+        <param name="laser_z_hit" value="0.5"/>
+        <param name="laser_z_short" value="0.05"/>
+        <param name="laser_z_max" value="0.05"/>
+        <param name="laser_z_rand" value="0.5"/>
+        <param name="laser_sigma_hit" value="0.2"/>
+        <param name="laser_lambda_short" value="0.1"/>
+        <param name="laser_model_type" value="likelihood_field"/>
+        <!-- <param name="laser_model_type" value="beam"/> -->
+        <param name="laser_likelihood_max_dist" value="2.0"/>
+        <param name="update_min_d" value="0.25"/>
+        <param name="update_min_a" value="0.2"/>
+        <param name="odom_frame_id" value="odom"/>
+        <param name="resample_interval" value="1"/>
+        <!-- Increase tolerance because the computer can get quite busy -->
+        <param name="transform_tolerance" value="1.0"/>
+        <param name="recovery_alpha_slow" value="0.0"/>
+        <param name="recovery_alpha_fast" value="0.0"/>
+        <!-- <remap from="scan" to="$(arg scan_topic)"/>     -->
+    </node>
+    <!-- move_base node -->
+    <node pkg="move_base" type="move_base" respawn="false" name="move_base" output="screen">
+        <rosparam file="$(find ril_agv_simulator)/config/costmap_common_params.yaml" command="load" ns="global_costmap"/>
+        <param name="global_costmap/scan/sensor_frame" type="str" value="robot_$(arg number)/hokuyo_link"/>
+        <param name="global_costmap/scan/topic" type="str" value="scan"/>
+
+        <rosparam file="$(find ril_agv_simulator)/config/costmap_common_params.yaml" command="load" ns="local_costmap"/>
+        <param name="local_costmap/scan/sensor_frame" type="str" value="robot_$(arg number)/hokuyo_link"/>
+        <param name="local_costmap/scan/topic" type="str" value="scan"/>
+
+        <rosparam file="$(find ril_agv_simulator)/config/local_costmap_params.yaml" command="load"/>
+        <param name="local_costmap/global_frame" type="str" value="robot_$(arg number)/odom"/>
+        <param name="local_costmap/robot_base_frame" type="str" value="robot_$(arg number)/base_link"/>
+
+        <rosparam file="$(find ril_agv_simulator)/config/global_costmap_params.yaml" command="load"/>
+        <param name="global_costmap/global_frame" type="str" value="robot_$(arg number)/map" />
+        <param name="global_costmap/robot_base_frame" type="str" value="robot_$(arg number)/base_link"/>
+
+        <rosparam file="$(find ril_agv_simulator)/config/base_local_planner_params.yaml" command="load"/>
+
+        <rosparam file="$(find ril_agv_simulator)/config/move_base_params.yaml" command="load"/>
+    </node>
+
+    <!-- <remap from="map" to="/map" /> -->
+    <!-- Align map and odom frames -->
+    <node pkg="tf" type="static_transform_publisher" name="odom_publisher_map_map" args="0 0 0 0 0 0 1 map robot_$(arg number)/map 100" />
+    <node pkg="tf" type="static_transform_publisher" name="odom_publisher_map_odom" args="0 0 0 0 0 0 1 robot_$(arg number)/map robot_$(arg number)/odom 100" />
+</launch>

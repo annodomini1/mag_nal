@@ -1,0 +1,3 @@
+<launch>
+    <node pkg="agent_dispatcher" type="agent.py" name="dispatcher_env" output="screen" />
+</launch>

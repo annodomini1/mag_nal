@@ -1,0 +1,8 @@
+prefix=/home/martin/disp2_ws/install
+
+Name: ril_agv_simulator
+Description: Description of ril_agv_simulator
+Version: 0.0.0
+Cflags: 
+Libs: -L${prefix}/lib 
+Requires: 

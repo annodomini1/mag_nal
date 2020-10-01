@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<launch>
+    <env name="GAZEBO_MODEL_PATH" value="$(find ril_agv_simulator)/media/models:$(optenv GAZEBO_MODEL_PATH)"/>
+    <!-- launch the simulator world -->
+    <arg name="debug" default="false"/>
+    <arg name="gui" default="true"/>
+    <arg name="headless" default="false"/>
+    <arg name="pause" default="false"/>
+    <arg name="world" default="ril_agv_simulator" />
+    <include file="$(find gazebo_ros)/launch/empty_world.launch">
+        <arg name="world_name" value="$(find ril_agv_simulator)/worlds/$(arg world).world"/>
+        <arg name="debug" value="$(arg debug)" />
+        <arg name="gui" value="$(arg gui)" />
+        <arg name="paused" value="$(arg pause)"/>
+        <arg name="use_sim_time" value="true"/>
+        <arg name="headless" value="$(arg headless)"/>
+        <arg name="verbose" value="true"/>
+    </include>
+
+    <!-- navigation, map server -->
+    <param name="use_sim_time" value="true"/>
+    <node name="map_server" pkg="map_server" type="map_server" args="$(find ril_agv_simulator)/map/map.yaml" output="screen" respawn="true">
+        <param name="frame_id" value="map"/>
+    </node>
+    <!-- map/odom alignment -->
+    <!-- <node pkg="tf" type="static_transform_publisher" name="odom_publisher_map_odom" args="0 0 0 0 0 0 1 map odom 100" /> -->
+    <!-- SPAWN ROBOTS -->
+    <group ns="robot_0">
+        <include file="$(find ril_agv_simulator)/launch/spawn_robot.launch">
+            <arg name="number" value="0"/>
+            <!-- <arg name="x" value="0.5"/>
+            <arg name="y" value="0.5"/> -->
+            <arg name="x" value="-6"/>
+            <arg name="y" value="6"/>
+            <arg name="yaw" value="0.0"/>
+        </include>
+    </group>
+
+    <group ns="robot_1">
+        <include file="$(find ril_agv_simulator)/launch/spawn_robot.launch">
+            <arg name="number" value="1"/>
+            <arg name="x" value="6"/>
+            <arg name="y" value="6"/>
+            <arg name="yaw" value="1.5707"/>
+        </include>
+    </group>
+
+    <group ns="robot_2">
+        <include file="$(find ril_agv_simulator)/launch/spawn_robot.launch">
+            <arg name="number" value="2"/>
+            <arg name="x" value="6"/>
+            <arg name="y" value="-6"/>
+            <arg name="yaw" value="-1.5707"/>
+        </include>
+    </group>
+
+    <group ns="robot_3">
+        <include file="$(find ril_agv_simulator)/launch/spawn_robot.launch">
+            <arg name="number" value="3"/>
+            <arg name="x" value="-6"/>
+            <arg name="y" value="-6"/>
+            <arg name="yaw" value="0"/>
+        </include>
+    </group>
+
+    <!-- spawn the camera -->
+    <param name="camera_description" command="$(find xacro)/xacro.py '$(find ril_agv_simulator)/urdf/camera.xacro'" />
+    <node name="urdf_camera_spawner" pkg="gazebo_ros" type="spawn_model" respawn="false" output="screen" args="-urdf -model camera -param camera_description"/>
+    <!-- camera viewer -->
+    <!-- <node name="viewer" pkg="rqt_image_view" type="rqt_image_view"/> -->
+    <!-- GUIs -->
+    <node name="rviz" pkg="rviz" type="rviz" args="-d $(find ril_agv_simulator)/config/config.rviz"/>
+    <!-- <node name="rqt_reconfigure" pkg="rqt_reconfigure" type="rqt_reconfigure"/> -->
+    <!-- <node pkg="rqt_publisher" type="rqt_publisher" name="rqt_publisher"/> -->
+    <!-- <param name="/robot_0/move_base/recovery_behavior_enabled" value="false"/>
+    <param name="/robot_0/move_base/clearing_rotation_allowed" value="false"/>
+    <param name="/robot_1/move_base/recovery_behavior_enabled" value="false"/>
+    <param name="/robot_1/move_base/clearing_rotation_allowed" value="false"/>
+    <param name="/robot_2/move_base/recovery_behavior_enabled" value="false"/>
+    <param name="/robot_2/move_base/clearing_rotation_allowed" value="false"/>
+    <param name="/robot_3/move_base/recovery_behavior_enabled" value="false"/>
+    <param name="/robot_3/move_base/clearing_rotation_allowed" value="false"/>
+    <param name="/robot_4/move_base/recovery_behavior_enabled" value="false"/>
+    <param name="/robot_4/move_base/clearing_rotation_allowed" value="false"/> -->
+    <param name="/robot_0/move_base/global_costmap/inflation_layer/cost_scaling_factor" value="0.5"/>
+    <param name="/robot_0/move_base/local_costmap/inflation_layer/cost_scaling_factor" value="0.5"/>
+    <param name="/robot_0/move_base/local_costmap/inflation_layer/inflation_radius" value="0.06"/>
+    <param name="/robot_1/move_base/global_costmap/inflation_layer/cost_scaling_factor" value="0.5"/>
+    <param name="/robot_1/move_base/local_costmap/inflation_layer/cost_scaling_factor" value="0.5"/>
+    <param name="/robot_1/move_base/local_costmap/inflation_layer/inflation_radius" value="0.06"/>
+    <param name="/robot_2/move_base/global_costmap/inflation_layer/cost_scaling_factor" value="0.5"/>
+    <param name="/robot_2/move_base/local_costmap/inflation_layer/cost_scaling_factor" value="0.5"/>
+    <param name="/robot_2/move_base/local_costmap/inflation_layer/inflation_radius" value="0.06"/>
+    <param name="/robot_3/move_base/global_costmap/inflation_layer/cost_scaling_factor" value="0.5"/>
+    <param name="/robot_3/move_base/local_costmap/inflation_layer/cost_scaling_factor" value="0.5"/>
+    <param name="/robot_3/move_base/local_costmap/inflation_layer/inflation_radius" value="0.06"/>
+
+    <param name="/robot_0/move_base/local_costmap/height" value="2"/>
+    <param name="/robot_0/move_base/local_costmap/width" value="2"/>
+    <param name="/robot_0/move_base/global_costmap/robot_radius" value="0.15"/>
+    <param name="/robot_0/move_base/global_costmap/inflation_layer/inflation_radius" value="0.2"/>
+    <param name="/robot_1/move_base/local_costmap/height" value="2"/>
+    <param name="/robot_1/move_base/local_costmap/width" value="2"/>
+    <param name="/robot_1/move_base/global_costmap/robot_radius" value="0.15"/>
+    <param name="/robot_1/move_base/global_costmap/inflation_layer/inflation_radius" value="0.2"/>
+    <param name="/robot_2/move_base/local_costmap/height" value="2"/>
+    <param name="/robot_2/move_base/local_costmap/width" value="2"/>
+    <param name="/robot_2/move_base/global_costmap/robot_radius" value="0.15"/>
+    <param name="/robot_2/move_base/global_costmap/inflation_layer/inflation_radius" value="0.2"/>
+    <param name="/robot_3/move_base/local_costmap/height" value="2"/>
+    <param name="/robot_3/move_base/local_costmap/width" value="2"/>
+    <param name="/robot_3/move_base/global_costmap/robot_radius" value="0.15"/>
+    <param name="/robot_3/move_base/global_costmap/inflation_layer/inflation_radius" value="0.2"/>
+
+</launch>

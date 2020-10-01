@@ -1,0 +1,4 @@
+<launch>
+    <node pkg="tester_node" type="tester.py" name="tester_node" output="screen" />
+    <include file="$(find dist_test)/launch/dists.launch"/>
+</launch>

@@ -1,0 +1,8 @@
+\subsubsection usage Usage
+\verbatim
+<node name="agent_dispatcher" pkg="agent_dispatcher" type="agent_dispatcher">
+  <param name="distance_factor" type="double" value="1.0" />
+  <param name="occupancy_factor" type="double" value="1.0" />
+</node>
+\endverbatim
+

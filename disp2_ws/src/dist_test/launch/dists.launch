@@ -1,0 +1,3 @@
+<launch>
+    <node pkg="dist_test" type="tester.py" name="dists_node" output="screen" />
+</launch>

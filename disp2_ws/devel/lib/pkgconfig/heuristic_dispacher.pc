@@ -1,0 +1,8 @@
+prefix=/home/martin/disp2_ws/devel
+
+Name: heuristic_dispacher
+Description: Description of heuristic_dispacher
+Version: 0.0.0
+Cflags: 
+Libs: -L${prefix}/lib 
+Requires: 

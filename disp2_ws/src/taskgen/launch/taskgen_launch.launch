@@ -1,0 +1,3 @@
+<launch>
+    <node pkg="taskgen" type="main_taskgen.py" name="taskgen_node" output="screen" />
+</launch>

@@ -1,0 +1,2 @@
+agent_batch_dispatcher:agent_dispatcher:dist_test:heuristic_dispatcher:listener_mc:random_dispatcher:ril_agv_simulator:taskgen:tester_node
+-DCATKIN_DEVEL_PREFIX=/home/martin/disp2_ws/devel -DCMAKE_INSTALL_PREFIX=/home/martin/disp2_ws/install -G Unix Makefiles

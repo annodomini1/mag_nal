@@ -1,0 +1,28 @@
+<?xml version="1.0"?>
+<sdf version='1.6'>
+    <world name='ril_agv_simulator'>
+        <include>
+            <uri>model://sun</uri>
+        </include>
+        <!-- <include>
+            <uri>model://ground_plane</uri>
+        </include> -->
+        <include>
+            <uri>model://floor</uri>
+        </include>
+        <include>
+            <uri>model://walls</uri>
+        </include>
+        <physics type='ode'>
+            <max_step_size>0.001</max_step_size>
+            <real_time_factor>1.000000</real_time_factor>
+            <real_time_update_rate>1000.0</real_time_update_rate>
+            <ode>
+                <solver>
+                    <type>quick</type>
+                    <iters>200</iters>
+                </solver>
+            </ode>
+        </physics>
+    </world>
+</sdf>

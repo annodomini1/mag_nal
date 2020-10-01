@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<launch>
+    <env name="GAZEBO_MODEL_PATH" value="$(find ril_agv_simulator)/media/models:$(optenv GAZEBO_MODEL_PATH)"/>
+    <!-- launch the simulator world -->
+    <arg name="debug" default="false"/>
+    <arg name="gui" default="true"/>
+    <arg name="headless" default="false"/>
+    <arg name="pause" default="false"/>
+    <arg name="world" default="ril_agv_simulator" />
+    <include file="$(find gazebo_ros)/launch/empty_world.launch">
+        <arg name="world_name" value="$(find ril_agv_simulator)/worlds/$(arg world).world"/>
+        <arg name="debug" value="$(arg debug)" />
+        <arg name="gui" value="$(arg gui)" />
+        <arg name="paused" value="$(arg pause)"/>
+        <arg name="use_sim_time" value="true"/>
+        <arg name="headless" value="$(arg headless)"/>
+        <arg name="verbose" value="true"/>
+    </include>
+    <!-- spawn a robot -->
+    <group ns="robot_0">
+        <include file="$(find ril_agv_simulator)/launch/spawn_robot_barebones.launch">
+            <arg name="number" value="0"/>
+            <arg name="x" value="0.25"/>
+            <arg name="y" value="0.0"/>
+        </include>
+        <arg name="use_tf_static" default="true"/>
+        <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher">
+            <param name="use_tf_static" value="$(arg use_tf_static)"/>
+            <param name="tf_prefix" value="robot_0"/>
+        </node>
+        <node pkg="teleop_twist_keyboard" type="teleop_twist_keyboard.py" name="key_teleop" output="screen"/>
+        <!-- run gmapping to map the floor -->
+        <node pkg="gmapping" type="slam_gmapping" name="gmapping" args="scan:=scan _base_frame:=/robot_0/base_link _odom_frame:=/odom" output="screen">
+            <!--param name="delta" value="0.1"/-->
+	</node>
+    </group>
+    <node pkg="tf" type="static_transform_publisher" name="odom_publisher_0" args="0 0 0 0 0 0 1 odom robot_0/odom 100"/>
+    <node pkg="rviz" type="rviz" name="rviz"/>
+</launch>
